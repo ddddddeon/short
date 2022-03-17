@@ -1,6 +1,7 @@
 const express = require("express");
 import * as redis from "redis";
 import * as mongodb from "mongodb";
+import { Shortener } from "./shortener";
 
 export class Server {
   interface: string;
@@ -21,11 +22,12 @@ export class Server {
   }
 
   async start() {
+    // connect to mongo
     const client = new mongodb.MongoClient(this.mongoUri);
     try {
       await client.connect();
       await client.db("admin").command({ ping: 1 });
-      console.log(`Connected successfully to ${this.mongoUri}`);
+      console.log(`Connected to ${this.mongoUri}`);
     } catch (err) {
       console.log(err);
       process.exit(1);
@@ -33,6 +35,7 @@ export class Server {
       await client.close();
     }
 
+    // connect to redis
     let rdb;
     try {
       rdb = redis.createClient({
@@ -43,13 +46,6 @@ export class Server {
       console.log(err);
       process.exit(1);
     }
-
-    const app = express();
-    app.get("/", (req: any, res: any) => {
-      res.json({
-        chris: "is cool",
-      });
-    });
 
     // expire least-recently used keys once 500mb limit is reached
     await rdb.configSet("maxmemory", "500mb");
@@ -62,6 +58,18 @@ export class Server {
     console.log(
       `Connected to ${this.redisUri} with maxmemory: ${maxmemory}, maxmemory-policy: ${maxmemoryPolicy}`
     );
+
+    const shortener = new Shortener(rdb, client);
+
+    // start app server
+    const app = express();
+    app.get("/", (req: any, res: any) => {
+      const shortened = shortener.shorten("https://google.com");
+
+      res.json({
+        testResponse: shortened,
+      });
+    });
 
     app.listen(this.port);
     console.log("server listening on port", this.port);
