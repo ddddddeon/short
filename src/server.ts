@@ -76,9 +76,9 @@ export class Server {
       });
     });
 
-    app.get("/:shortUrl", async (req: any, res: any) => {
+    app.get("/:hash", async (req: any, res: any) => {
       const retrieved = await shortener.retrieveUrl(
-        decodeURIComponent(req.params.shortUrl)
+        decodeURIComponent(req.params.hash)
       );
 
       res.json({

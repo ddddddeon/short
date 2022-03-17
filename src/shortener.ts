@@ -38,9 +38,21 @@ export class Shortener {
     return shortened.shortUrl;
   }
 
-  async retrieveUrl(shortUrl: string): Promise<string> {
-    console.log(shortUrl);
-    return "bar";
+  async retrieveUrl(hash: string): Promise<string> {
+    const cachedResult = await this.rdb.get(hash);
+    if (cachedResult) {
+      return cachedResult;
+    }
+
+    const dbResult = await this.db.collection("urls").findOne({
+      hash: hash
+    });
+    if (dbResult) {
+      return dbResult.longUrl;
+    }
+
+    // redirect to homepage if no result found in cache or db
+    return this.hostname + (this.port === "443" || this.port === "80" ? "" : ":" + this.port);
   }
 
   private constructUrlFromHash(hash: string) {
