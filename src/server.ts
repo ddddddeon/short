@@ -25,7 +25,7 @@ export class Server {
     try {
       await client.connect();
       await client.db("admin").command({ ping: 1 });
-      console.log("Connected successfully to server");
+      console.log(`Connected successfully to ${this.mongoUri}`);
     } catch (err) {
       console.log(err);
       process.exit(1);
@@ -51,9 +51,13 @@ export class Server {
       });
     });
 
-    await rdb.set("chris", "cool");
-    const res = await rdb.get("chris");
-    console.log(res);
+    // expire least-recently used keys once 500mb limit is reached
+    await rdb.configSet("maxmemory", "500mb");
+    await rdb.configSet("maxmemory-policy", "allkeys-lru");
+
+    const maxmemory = await rdb.configGet("maxmemory");
+    const maxmemoryPolicy = await rdb.configGet("maxmemory-policy");
+    console.log(`Connected to ${this.redisUri} with settings ${JSON.stringify(maxmemory)}, ${JSON.stringify(maxmemoryPolicy)}`);
 
     app.listen(this.port);
     console.log("server listening on port", this.port);

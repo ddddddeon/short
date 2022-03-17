@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "npm run format:fix; npm install; npm run compile; npm run docker",
     "compile": "./node_modules/.bin/tsc -b --verbose --pretty",
+    "docker": "npm run docker:build; npm run docker:push",
     "docker:build": "docker build --tag dddeon/short .",
     "docker:push": "docker push dddeon/short",
     "kube": "npm run kube:redis; npm run kube:short",
