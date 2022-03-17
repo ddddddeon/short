@@ -63,11 +63,23 @@ export class Server {
 
     // start app server
     const app = express();
-    app.get("/", (req: any, res: any) => {
-      const shortened = shortener.shorten("https://google.com");
+    app.get("/shorten/:longUrl", (req: any, res: any) => {
+      const shortened = shortener.shortenUrl(
+        decodeURIComponent(req.params.longUrl)
+      );
 
       res.json({
         testResponse: shortened,
+      });
+    });
+
+    app.get("/retrieve/:shortUrl", (req: any, res: any) => {
+      const retrieved = shortener.retrieveUrl(
+        decodeURIComponent(req.params.shortUrl)
+      );
+
+      res.json({
+        testResponse: retrieved,
       });
     });
 

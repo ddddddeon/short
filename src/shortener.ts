@@ -12,7 +12,13 @@ export class Shortener {
     this.db = _db;
   }
 
-  shorten(url: string): string {
+  shortenUrl(longUrl: string): string {
+    console.log(longUrl);
     return "foo";
+  }
+
+  retrieveUrl(shortUrl: string): string {
+    console.log(shortUrl);
+    return "bar";
   }
 }
