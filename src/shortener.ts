@@ -37,7 +37,7 @@ export class Shortener {
           console.log(`Collision detected! Salting the input and regenerating hash...`)
           existsAlready = true;
           salt++;
-        } else if (result && result.url === longUrl) {
+        } else {
           console.log(`URL provided matches URL in the database-- returning the existing hash`)
         }
       } else {
