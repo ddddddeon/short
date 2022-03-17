@@ -55,12 +55,12 @@ export class Server {
     await rdb.configSet("maxmemory", "500mb");
     await rdb.configSet("maxmemory-policy", "allkeys-lru");
 
-    const maxmemory = await rdb.configGet("maxmemory");
-    const maxmemoryPolicy = await rdb.configGet("maxmemory-policy");
+    const maxmemory = (await rdb.configGet("maxmemory")).maxmemory;
+    const maxmemoryPolicy = (await rdb.configGet("maxmemory-policy"))[
+      "maxmemory-policy"
+    ];
     console.log(
-      `Connected to ${this.redisUri} with settings ${JSON.stringify(
-        maxmemory
-      )}, ${JSON.stringify(maxmemoryPolicy)}`
+      `Connected to ${this.redisUri} with maxmemory: ${maxmemory}, maxmemory-policy: ${maxmemoryPolicy}`
     );
 
     app.listen(this.port);
