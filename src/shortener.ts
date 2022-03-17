@@ -32,7 +32,8 @@ export class Shortener {
 
     do {
       shortened = await this.generateShortenedUrl(longUrl, salt);
-    } while (shortened.existsAlready === true);
+      salt++;
+    } while (shortened.existsAlready);
 
     return shortened.shortUrl;
   }
@@ -40,6 +41,13 @@ export class Shortener {
   async retrieveUrl(shortUrl: string): Promise<string> {
     console.log(shortUrl);
     return "bar";
+  }
+
+  private constructUrlFromHash(hash: string) {
+    return this.hostname +
+      (this.port === "443" || this.port === "80" ? "" : ":" + this.port) +
+      "/" +
+      hash;
   }
 
   private async generateShortenedUrl(longUrl: string, salt: number): Promise<any> {
@@ -59,41 +67,36 @@ export class Shortener {
     }
 
     encoded = encoded.substring(0, 7);
-    let shortUrl =
-      this.hostname +
-      (this.port === "443" || this.port === "80" ? "" : ":" + this.port) +
-      "/" +
-      encoded;
+    let shortUrl = this.constructUrlFromHash(encoded);
 
     console.log(`Generated short URL: ${shortUrl}`);
     const result = await this.db.collection("urls").findOne({
-      shortUrl: shortUrl,
+      hash: encoded,
     });
 
     if (result) {
-      console.log(`Short URL already exists in db: ${result.shortUrl}`);
+      console.log(`Short URL hash already exists in db: ${result.hash}`);
       if (result.longUrl !== longUrl) {
         console.log(
           `Collision detected! Salting the input and regenerating hash...`
         );
         existsAlready = true;
-        salt++;
       } else {
         console.log(
           `Long URL provided matches long URL in the database-- returning the existing hash`
         );
       }
     } else {
-      const cached = await this.rdb.set(shortUrl, longUrl);
+      const cached = await this.rdb.set(encoded, longUrl);
       if (cached !== "OK") {
         console.log(`Error writing to cache: ${cached}`);
       } else {
         console.log(`Inserted URL and hash into cache`);
       }
 
-      console.log(`Inserting URL and hash into db: ${longUrl} : ${shortUrl}`);
+      console.log(`Inserting URL and hash into db: ${longUrl} : ${encoded}`);
       await this.db.collection("urls").insertOne({
-        shortUrl: shortUrl,
+        hash: encoded,
         longUrl: longUrl,
       });
     }
