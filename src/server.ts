@@ -24,15 +24,15 @@ export class Server {
   async start() {
     // connect to mongo
     const client = new mongodb.MongoClient(this.mongoUri);
+    let db;
     try {
       await client.connect();
       await client.db("admin").command({ ping: 1 });
+      db = await client.db("shortdb");
       console.log(`Connected to ${this.mongoUri}`);
     } catch (err) {
       console.log(err);
       process.exit(1);
-    } finally {
-      await client.close();
     }
 
     // connect to redis
@@ -59,12 +59,12 @@ export class Server {
       `Connected to ${this.redisUri} with maxmemory: ${maxmemory}, maxmemory-policy: ${maxmemoryPolicy}`
     );
 
-    const shortener = new Shortener(rdb, client);
+    const shortener = new Shortener(rdb, db);
 
     // start app server
     const app = express();
-    app.get("/shorten/:longUrl", (req: any, res: any) => {
-      const shortened = shortener.shortenUrl(
+    app.get("/shorten/:longUrl", async (req: any, res: any) => {
+      const shortened = await shortener.shortenUrl(
         decodeURIComponent(req.params.longUrl)
       );
 
@@ -73,8 +73,8 @@ export class Server {
       });
     });
 
-    app.get("/retrieve/:shortUrl", (req: any, res: any) => {
-      const retrieved = shortener.retrieveUrl(
+    app.get("/:shortUrl", async (req: any, res: any) => {
+      const retrieved = await shortener.retrieveUrl(
         decodeURIComponent(req.params.shortUrl)
       );
 
