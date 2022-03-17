@@ -53,6 +53,13 @@ export class Shortener {
           console.log(`URL provided matches URL in the database-- returning the existing hash`)
         }
       } else {
+        const cached = await this.rdb.set(encoded, longUrl);
+        if (cached !== "OK") {
+          console.log(`Error writing to cache: ${cached}`);
+        } else {
+          console.log(`Inserted URL and hash into cache`);
+        }
+
         console.log(`Inserting URL and hash into db: ${longUrl} : ${encoded}`)
         await this.db.collection("urls").insertOne({
           hash: encoded,
