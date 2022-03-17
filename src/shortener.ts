@@ -28,25 +28,25 @@ export class Shortener {
     console.log(`Shortening url ${longUrl}...`);
 
     let salt = 0;
-    let hash = "";
-    let encoded = "";
+    let shortUrl = "";
     let existsAlready = false;
 
     do {
-      hash = crypto
+      const hash = crypto
         .createHash("md5")
         .update(longUrl + salt.toString())
         .digest("hex");
 
       console.log(`Hashed URL ${longUrl} with salt ${salt.toString()}`);
 
+      let encoded = "";
       for (let i = 0; i < hash.length - 1; i += 2) {
         const idx = parseInt(`0x${hash[i]}${hash[i + 1]}`);
         encoded += BASE58[idx % BASE58.length];
       }
 
       encoded = encoded.substring(0, 7);
-      const shortUrl =
+      shortUrl =
         this.hostname +
         (this.port === "443" || this.port === "80" ? "" : ":" + this.port) +
         "/" +
@@ -69,6 +69,7 @@ export class Shortener {
           console.log(
             `Long URL provided matches long URL in the database-- returning the existing hash`
           );
+          shortUrl = result.shortUrl;
         }
       } else {
         const cached = await this.rdb.set(shortUrl, longUrl);
