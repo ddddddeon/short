@@ -57,7 +57,11 @@ export class Server {
 
     const maxmemory = await rdb.configGet("maxmemory");
     const maxmemoryPolicy = await rdb.configGet("maxmemory-policy");
-    console.log(`Connected to ${this.redisUri} with settings ${JSON.stringify(maxmemory)}, ${JSON.stringify(maxmemoryPolicy)}`);
+    console.log(
+      `Connected to ${this.redisUri} with settings ${JSON.stringify(
+        maxmemory
+      )}, ${JSON.stringify(maxmemoryPolicy)}`
+    );
 
     app.listen(this.port);
     console.log("server listening on port", this.port);
