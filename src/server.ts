@@ -5,17 +5,20 @@ import { Shortener } from "./shortener";
 
 export class Server {
   interface: string;
+  hostname: string;
   port: string;
   mongoUri: string;
   redisUri: string;
 
   constructor(
     _interface: string,
+    _hostname: string,
     _port: string,
     _mongoUri: string,
     _redisUri: string
   ) {
     this.interface = _interface;
+    this.hostname = _hostname;
     this.port = _port;
     this.mongoUri = _mongoUri;
     this.redisUri = _redisUri;
@@ -59,7 +62,7 @@ export class Server {
       `Connected to ${this.redisUri} with maxmemory: ${maxmemory}, maxmemory-policy: ${maxmemoryPolicy}`
     );
 
-    const shortener = new Shortener(rdb, db);
+    const shortener = new Shortener(rdb, db, this.hostname, this.port);
 
     // start app server
     const app = express();

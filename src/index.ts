@@ -1,5 +1,6 @@
 import { Server } from "./server";
 
+const hostname = process.env.HOSTNAME ?? "http://localhost";
 const port = process.env.PORT ?? "9000";
 const mongoUri =
   "mongodb://" +
@@ -13,4 +14,4 @@ const redisUri =
   ":" +
   (process.env.REDIS_PORT ?? "6379");
 
-new Server("0.0.0.0", port, mongoUri, redisUri).start();
+new Server("0.0.0.0", hostname, port, mongoUri, redisUri).start();
