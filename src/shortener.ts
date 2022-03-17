@@ -28,70 +28,76 @@ export class Shortener {
     console.log(`Shortening url ${longUrl}...`);
 
     let salt = 0;
-    let shortUrl = "";
-    let existsAlready = false;
+    let shortened = { shortUrl: "", existsAlready: false };
 
     do {
-      const hash = crypto
-        .createHash("md5")
-        .update(longUrl + salt.toString())
-        .digest("hex");
+      shortened = await this.generateShortenedUrl(longUrl, salt);
+    } while (shortened.existsAlready === true);
 
-      console.log(`Hashed URL ${longUrl} with salt ${salt.toString()}`);
-
-      let encoded = "";
-      for (let i = 0; i < hash.length - 1; i += 2) {
-        const idx = parseInt(`0x${hash[i]}${hash[i + 1]}`);
-        encoded += BASE58[idx % BASE58.length];
-      }
-
-      encoded = encoded.substring(0, 7);
-      shortUrl =
-        this.hostname +
-        (this.port === "443" || this.port === "80" ? "" : ":" + this.port) +
-        "/" +
-        encoded;
-
-      console.log(`Generated short URL: ${shortUrl}`);
-      const result = await this.db.collection("urls").findOne({
-        shortUrl: shortUrl,
-      });
-
-      if (result) {
-        console.log(`Short URL already exists in db: ${result.shortUrl}`);
-        if (result.longUrl !== longUrl) {
-          console.log(
-            `Collision detected! Salting the input and regenerating hash...`
-          );
-          existsAlready = true;
-          salt++;
-        } else {
-          console.log(
-            `Long URL provided matches long URL in the database-- returning the existing hash`
-          );
-          shortUrl = result.shortUrl;
-        }
-      } else {
-        const cached = await this.rdb.set(shortUrl, longUrl);
-        if (cached !== "OK") {
-          console.log(`Error writing to cache: ${cached}`);
-        } else {
-          console.log(`Inserted URL and hash into cache`);
-        }
-
-        console.log(`Inserting URL and hash into db: ${longUrl} : ${shortUrl}`);
-        await this.db.collection("urls").insertOne({
-          shortUrl: shortUrl,
-          longUrl: longUrl,
-        });
-      }
-    } while (existsAlready === true);
-
-    return shortUrl;
+    return shortened.shortUrl;
   }
 
   async retrieveUrl(shortUrl: string): Promise<string> {
     console.log(shortUrl);
     return "bar";
+  }
+
+  private async generateShortenedUrl(longUrl: string, salt: number): Promise<any> {
+    let existsAlready = false;
+
+    const hash = crypto
+      .createHash("md5")
+      .update(longUrl + salt.toString())
+      .digest("hex");
+
+    console.log(`Hashed URL ${longUrl} with salt ${salt.toString()}`);
+
+    let encoded = "";
+    for (let i = 0; i < hash.length - 1; i += 2) {
+      const idx = parseInt(`0x${hash[i]}${hash[i + 1]}`);
+      encoded += BASE58[idx % BASE58.length];
+    }
+
+    encoded = encoded.substring(0, 7);
+    let shortUrl =
+      this.hostname +
+      (this.port === "443" || this.port === "80" ? "" : ":" + this.port) +
+      "/" +
+      encoded;
+
+    console.log(`Generated short URL: ${shortUrl}`);
+    const result = await this.db.collection("urls").findOne({
+      shortUrl: shortUrl,
+    });
+
+    if (result) {
+      console.log(`Short URL already exists in db: ${result.shortUrl}`);
+      if (result.longUrl !== longUrl) {
+        console.log(
+          `Collision detected! Salting the input and regenerating hash...`
+        );
+        existsAlready = true;
+        salt++;
+      } else {
+        console.log(
+          `Long URL provided matches long URL in the database-- returning the existing hash`
+        );
+      }
+    } else {
+      const cached = await this.rdb.set(shortUrl, longUrl);
+      if (cached !== "OK") {
+        console.log(`Error writing to cache: ${cached}`);
+      } else {
+        console.log(`Inserted URL and hash into cache`);
+      }
+
+      console.log(`Inserting URL and hash into db: ${longUrl} : ${shortUrl}`);
+      await this.db.collection("urls").insertOne({
+        shortUrl: shortUrl,
+        longUrl: longUrl,
+      });
+    }
+
+    return { shortUrl: shortUrl, existsAlready: existsAlready };
   }
 }
