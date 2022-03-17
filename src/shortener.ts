@@ -2,6 +2,8 @@ import * as redis from "redis";
 import { Db } from "mongodb";
 import * as crypto from "crypto";
 
+const BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
 type RedisClientType = ReturnType<typeof redis.createClient>;
 
 export class Shortener {
@@ -18,6 +20,7 @@ export class Shortener {
 
     let salt = 0;
     let hash = "";
+    let encoded = "";
     let existsAlready = false;
 
     do {
@@ -26,13 +29,22 @@ export class Shortener {
         .update(longUrl + salt.toString())
         .digest("hex");
 
+      for (let i = 0; i < hash.length - 1; i += 2) {
+        const idx = parseInt(`0x${hash[i]}${hash[i + 1]}`);
+        encoded += BASE58[idx % BASE58.length];
+      }
+
+      encoded = encoded.substring(0, 7);
+
+      console.log(`Base58-encoded hash: ${encoded}`);
+
       console.log(`Hashed URL ${longUrl} with salt ${salt.toString()}`)
       const result = await this.db.collection("urls").findOne({
-        hash: hash,
+        hash: encoded,
       });
 
       if (result) {
-        console.log(`Hash already exists in db: ${hash}`);
+        console.log(`Hash already exists in db: ${result.hash}`);
         if (result.url !== longUrl) {
           console.log(`Collision detected! Salting the input and regenerating hash...`)
           existsAlready = true;
@@ -41,15 +53,15 @@ export class Shortener {
           console.log(`URL provided matches URL in the database-- returning the existing hash`)
         }
       } else {
-        console.log(`Inserting URL and hash into db: ${longUrl} : ${hash}`)
+        console.log(`Inserting URL and hash into db: ${longUrl} : ${encoded}`)
         await this.db.collection("urls").insertOne({
-          hash: hash,
+          hash: encoded,
           url: longUrl,
         });
       }
     } while (existsAlready === true);
 
-    return hash;
+    return encoded;
   }
 
   async retrieveUrl(shortUrl: string): Promise<string> {
