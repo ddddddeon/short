@@ -72,16 +72,17 @@ export class Shortener {
 
     console.log(`Hashed URL ${longUrl} with salt ${salt.toString()}`);
 
+    // base58-encode the hash byte by byte and truncate to length of 7
     let encoded = "";
     for (let i = 0; i < hash.length - 1; i += 2) {
       const idx = parseInt(`0x${hash[i]}${hash[i + 1]}`);
       encoded += BASE58[idx % BASE58.length];
     }
-
     encoded = encoded.substring(0, 7);
-    let shortUrl = this.constructUrlFromHash(encoded);
 
+    let shortUrl = this.constructUrlFromHash(encoded);
     console.log(`Generated short URL: ${shortUrl}`);
+
     const result = await this.db.collection("urls").findOne({
       hash: encoded,
     });
