@@ -72,12 +72,18 @@ export class Server {
     // set up prometheus instrumentation
     prometheus.collectDefaultMetrics();
 
-    const shortener = new Shortener(rdb, db, this.hostname, this.port, this.proxyPort);
+    const shortener = new Shortener(
+      rdb,
+      db,
+      this.hostname,
+      this.port,
+      this.proxyPort
+    );
     const app = express();
 
     app.get("/", (req: any, res: any) => {
       res.sendFile(path.join(__dirname, "../public/index.html"));
-    })
+    });
 
     app.get("/metrics", async (req: any, res: any) => {
       res.set("Content-Type", prometheus.contentType);
