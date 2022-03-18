@@ -51,7 +51,7 @@ export class Server {
     }
 
     // expire least-recently used keys once 500mb limit is reached
-    await rdb.configSet("maxmemory", "500mb");
+    await rdb.configSet("maxmemory", "100mb");
     await rdb.configSet("maxmemory-policy", "allkeys-lru");
 
     const maxmemory = (await rdb.configGet("maxmemory")).maxmemory;
