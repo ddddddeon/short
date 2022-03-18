@@ -77,17 +77,12 @@ export class Server {
     });
 
     app.get("/:hash", async (req: any, res: any) => {
-      let longUrl = await shortener.getLongUrlFromShort(
+      const retrieved = await shortener.retrieveUrl(
         decodeURIComponent(req.params.hash)
       );
 
-      // redirect to homepage if no result found in cache or db
-      if (!longUrl) {
-        longUrl = this.hostname + (this.port === "443" || this.port === "80" ? "" : ":" + this.port)
-      }
-
       res.json({
-        longUrl: longUrl,
+        longUrl: retrieved,
       });
     });
 
