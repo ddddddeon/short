@@ -73,12 +73,10 @@ export class Shortener {
     Metrics.timeToRetrieveMs.set(Date.now() - start);
 
     // redirect to homepage if no result found in cache or db
-    return (
-      this.hostname + (this.isHttpOrHttps(this.port) ? "" : ":" + this.port)
-    );
+    return this.hostname + (this.isHttpOrHttps() ? "" : ":" + this.proxyPort);
   }
 
-  private isHttpOrHttps(port: string) {
+  private isHttpOrHttps() {
     return (
       this.port === "443" ||
       this.port === "80" ||
@@ -90,7 +88,7 @@ export class Shortener {
   private constructUrlFromHash(hash: string) {
     return (
       this.hostname +
-      (this.isHttpOrHttps(this.port) ? "" : ":" + this.port) +
+      (this.isHttpOrHttps() ? "" : ":" + this.proxyPort) +
       "/" +
       hash
     );

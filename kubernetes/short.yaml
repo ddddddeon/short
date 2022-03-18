@@ -21,11 +21,11 @@ spec:
             - containerPort: 9000
           env:
             - name: APP_HOST
-              value: "https://ddddddeon.com"
+              value: "http://192.168.49.2" # FIXME https://ddddddeon.com
             - name: APP_PORT
               value: "9000"
             - name: PROXY_PORT
-              value: "443"
+              value: "30001" #FIXME 443
             - name: MONGO_HOST
               value: host.minikube.internal # minikube-specific access to host machine
             - name: MONGO_PORT
