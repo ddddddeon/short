@@ -1,7 +1,7 @@
 import { Server } from "./server";
 
-const hostname = process.env.HOSTNAME ?? "http://localhost";
-const port = process.env.PORT ?? "9000";
+const hostname = process.env.APP_HOST ?? "http://localhost";
+const port = process.env.APP_PORT ?? "9000";
 const mongoUri =
   "mongodb://" +
   (process.env.MONGO_HOST ?? "localhost") +
