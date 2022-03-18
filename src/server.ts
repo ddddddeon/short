@@ -1,5 +1,6 @@
 const express = require("express");
 
+import * as path from "path";
 import * as redis from "redis";
 import * as mongodb from "mongodb";
 import * as prometheus from "prom-client";
@@ -70,6 +71,10 @@ export class Server {
 
     const shortener = new Shortener(rdb, db, this.hostname, this.port);
     const app = express();
+
+    app.get("/", (req: any, res: any) => {
+      res.sendFile(path.join(__dirname, "../public/index.html"));
+    })
 
     app.get("/metrics", async (req: any, res: any) => {
       res.set("Content-Type", prometheus.contentType);

@@ -9,7 +9,6 @@ const BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 type RedisClientType = ReturnType<typeof redis.createClient>;
 
-
 export class Shortener {
   rdb: RedisClientType;
   db: Db;
@@ -144,7 +143,11 @@ export class Shortener {
         longUrl: longUrl,
       });
 
-      await Metrics.incrementMetric(this.db, Metrics.urlsShortened, "urls_shortened");
+      await Metrics.incrementMetric(
+        this.db,
+        Metrics.urlsShortened,
+        "urls_shortened"
+      );
     }
 
     return { shortUrl: shortUrl, existsAlready: existsAlready };

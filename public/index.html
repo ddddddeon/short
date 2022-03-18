@@ -1,0 +1,105 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <style>
+    #title-header {
+      color: white;
+      margin-top: 10px
+    }
+
+    #url {
+      width: 50%;
+    }
+
+    #result {
+      height: 40px;
+      width: 287px;
+      resize: none;
+      display: inline;
+      float: left;
+    }
+
+    #copy-button {
+      display: inline;
+      float: left;
+    }
+
+    #copied {
+      font-size: 200%;
+      color: green;
+      display: inline;
+    }
+  </style>
+
+  <title>URL Shortener</title>
+</head>
+
+<body style="background: #121212; !important;">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+
+  <script>9
+    async function shortenUrl() {
+      var shortenElem = document.getElementById("shorten");
+      var urlInput = document.getElementById("url");
+      var resultElem = document.getElementById("result");
+      var copyButtonElem = document.getElementById("copy-button");
+      var copiedElem = document.getElementById("copied");
+      var spinnerElem = document.getElementById("loading-spinner");
+
+      resultElem.hidden = true;
+      copiedElem.hidden = true; 7
+      copyButtonElem.hidden = true;
+      spinnerElem.hidden = false;
+      copyButtonElem.classList.remove("bg-success");
+      copyButtonElem.classList.add("bg-primary");
+
+      var xhr = new XMLHttpRequest();
+
+      // TODO validate input lol
+      xhr.open("GET", "/shorten/" + urlInput.value);
+      xhr.responseType = "json";
+
+      xhr.onload = () => {
+        spinnerElem.hidden = true;
+        resultElem.value = xhr.response.shortUrl;
+        resultElem.hidden = false;
+        copyButtonElem.innerText = "Copy to Clipboard";
+        copyButtonElem.hidden = false;
+      };
+
+      copyButtonElem.onclick = () => {
+        resultElem.focus();
+        resultElem.select();
+        document.execCommand("copy");
+        resultElem.blur();
+        copyButtonElem.classList.add("bg-success");
+        copyButtonElem.innerText = "Copied!"
+      }
+
+      xhr.send();
+    }
+  </script>
+
+  <div id="shorten" class="container">
+    <header class="d-flex flex-wrap" id="title-header">
+      <h1>URL Shortener</h1>
+    </header>
+    <br>
+    <input type="text" id="url" name="url" class="form-control" placeholder="Paste long URL here...">
+    <br>
+    <button class="btn btn-primary" onclick="shortenUrl()">Shorten</button>
+    <br><br>
+    <div class="spinner-border text-info" role="status" id="loading-spinner" hidden>
+      <span class="sr-only">Loading...</span>
+    </div>
+    <textarea hidden id="result" class="form-control"></textarea>
+    <button id="copy-button" class="btn btn-primary" hidden></button>
+    <div id="copied" hidden>&#10004;</div>
+    <br><br>
+  </div>
+</body>
