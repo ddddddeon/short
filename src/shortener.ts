@@ -14,17 +14,20 @@ export class Shortener {
   db: Db;
   hostname: string;
   port: string;
+  proxyPort: string;
 
   constructor(
     _rdb: RedisClientType,
     _db: Db,
     _hostname: string,
-    _port: string
+    _port: string,
+    _proxyPort: string,
   ) {
     this.rdb = _rdb;
     this.db = _db;
     this.hostname = _hostname;
     this.port = _port;
+    this.proxyPort = _proxyPort;
   }
 
   async shortenUrl(longUrl: string): Promise<string> {
@@ -72,14 +75,18 @@ export class Shortener {
     // redirect to homepage if no result found in cache or db
     return (
       this.hostname +
-      (this.port === "443" || this.port === "80" ? "" : ":" + this.port)
+      (this.isHttpOrHttps(this.port) ? "" : ":" + this.port)
     );
+  }
+
+  private isHttpOrHttps(port: string) {
+    return this.port === "443" || this.port === "80" || this.proxyPort === "443" || this.proxyPort === "80";
   }
 
   private constructUrlFromHash(hash: string) {
     return (
       this.hostname +
-      (this.port === "443" || this.port === "80" ? "" : ":" + this.port) +
+      (this.isHttpOrHttps(this.port) ? "" : ":" + this.port) +
       "/" +
       hash
     );

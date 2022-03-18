@@ -11,6 +11,7 @@ export class Server {
   interface: string;
   hostname: string;
   port: string;
+  proxyPort: string;
   mongoUri: string;
   redisUri: string;
 
@@ -18,12 +19,14 @@ export class Server {
     _interface: string,
     _hostname: string,
     _port: string,
+    _proxyPort: string,
     _mongoUri: string,
     _redisUri: string
   ) {
     this.interface = _interface;
     this.hostname = _hostname;
     this.port = _port;
+    this.proxyPort = _proxyPort;
     this.mongoUri = _mongoUri;
     this.redisUri = _redisUri;
   }
@@ -69,7 +72,7 @@ export class Server {
     // set up prometheus instrumentation
     prometheus.collectDefaultMetrics();
 
-    const shortener = new Shortener(rdb, db, this.hostname, this.port);
+    const shortener = new Shortener(rdb, db, this.hostname, this.port, this.proxyPort);
     const app = express();
 
     app.get("/", (req: any, res: any) => {
@@ -96,9 +99,6 @@ export class Server {
         decodeURIComponent(req.params.hash)
       );
 
-      if (!longUrl.startsWith("http")) {
-        longUrl = "https://" + longUrl;
-      }
       res.redirect(longUrl);
     });
 
