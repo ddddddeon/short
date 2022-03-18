@@ -1,10 +1,18 @@
 import * as redis from "redis";
 import { Db } from "mongodb";
 import * as crypto from "crypto";
+import { Gauge } from "prom-client";
+
+import { Util } from "./util";
 
 const BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 type RedisClientType = ReturnType<typeof redis.createClient>;
+
+const hashCollisionGauge = new Gauge<string>({
+  name: "hash_collisions2",
+  help: "Number of hash collisions that have occurred",
+});
 
 export class Shortener {
   rdb: RedisClientType;
@@ -98,10 +106,17 @@ export class Shortener {
     if (result) {
       console.log(`Short URL hash already exists in db: ${result.hash}`);
       if (result.longUrl !== longUrl) {
-        console.log(
-          `Collision detected! Salting the input and regenerating hash...`
-        );
         existsAlready = true;
+
+        const hashCollisionCount = await Util.incrementMetric(
+          this.db,
+          hashCollisionGauge,
+          "hash_collisions"
+        );
+
+        console.log(
+          `Collision detected! (${hashCollisionCount} total) Salting the input and regenerating hash...`
+        );
       } else {
         console.log(
           `Long URL provided matches long URL in the database-- returning the existing hash`
