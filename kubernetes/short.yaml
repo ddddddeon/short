@@ -30,6 +30,10 @@ spec:
               value: redis-master
             - name: REDIS_PORT
               value: "6379"
+            - name: PROMETHEUS_HOST
+              value: prometheus
+            - name: PROMETHEUS_PORT
+              value: "9090"
 
 ---
 apiVersion: v1

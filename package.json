@@ -7,12 +7,13 @@
     "build": "npm run format:fix; npm install; npm run compile; npm run docker",
     "compile": "./node_modules/.bin/tsc -b --verbose --pretty",
     "docker": "npm run docker:build; npm run docker:push",
-    "docker:build": "docker build --tag dddeon/short .",
-    "docker:push": "docker push dddeon/short",
+    "docker:build": "docker build --tag dddeon/short .; docker build --tag dddeon/prom -f Dockerfile.prometheus .",
+    "docker:push": "docker push dddeon/short; docker push dddeon/prom",
     "kube": "npm run kube:redis; npm run kube:short",
-    "kube:redis": "kubectl create -f redis.yaml",
-    "kube:short": "kubectl create -f short.yaml",
-    "kube:delete": "kubectl delete -f short.yaml; kubectl delete -f redis.yaml",
+    "kube:redis": "kubectl create -f kubernetes/redis.yaml",
+    "kube:short": "kubectl create -f kubernetes/short.yaml",
+    "kube:prom": "kubectl create -f kubernetes/prom.yaml",
+    "kube:delete": "kubectl delete -f kubernetes/short.yaml; kubectl delete -f kubernetes/redis.yaml",
     "format": "./node_modules/.bin/prettier -c ./src",
     "format:fix": "./node_modules/.bin/prettier -w ./src",
     "start": "node dist/index.js"
@@ -22,6 +23,7 @@
   "dependencies": {
     "express": "^4.17.3",
     "mongodb": "^4.4.1",
+    "prom-client": "^14.0.1",
     "redis": "^4.0.4"
   },
   "devDependencies": {

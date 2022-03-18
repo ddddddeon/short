@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: master
-          image: prom/prometheus
+          image: dddeon/prom
           resources:
             requests:
               cpu: 100m

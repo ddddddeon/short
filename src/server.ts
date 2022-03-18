@@ -2,6 +2,7 @@ const express = require("express");
 import * as redis from "redis";
 import * as mongodb from "mongodb";
 import { Shortener } from "./shortener";
+import * as prom from "prom-client";
 
 export class Server {
   interface: string;
@@ -62,6 +63,8 @@ export class Server {
       `Connected to ${this.redisUri} with maxmemory: ${maxmemory}, maxmemory-policy: ${maxmemoryPolicy}`
     );
 
+    prom.collectDefaultMetrics();
+
     const shortener = new Shortener(rdb, db, this.hostname, this.port);
 
     // start app server
@@ -74,6 +77,11 @@ export class Server {
       res.json({
         shortUrl: shortened,
       });
+    });
+
+    app.get("/metrics", async (req: any, res: any) => {
+      res.set("Content-Type", prom.contentType);
+      res.end(await prom.register.metrics());
     });
 
     app.get("/:hash", async (req: any, res: any) => {

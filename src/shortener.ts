@@ -45,24 +45,32 @@ export class Shortener {
     }
 
     const dbResult = await this.db.collection("urls").findOne({
-      hash: hash
+      hash: hash,
     });
     if (dbResult) {
       return dbResult.longUrl;
     }
 
     // redirect to homepage if no result found in cache or db
-    return this.hostname + (this.port === "443" || this.port === "80" ? "" : ":" + this.port);
+    return (
+      this.hostname +
+      (this.port === "443" || this.port === "80" ? "" : ":" + this.port)
+    );
   }
 
   private constructUrlFromHash(hash: string) {
-    return this.hostname +
+    return (
+      this.hostname +
       (this.port === "443" || this.port === "80" ? "" : ":" + this.port) +
       "/" +
-      hash;
+      hash
+    );
   }
 
-  private async generateShortenedUrl(longUrl: string, salt: number): Promise<any> {
+  private async generateShortenedUrl(
+    longUrl: string,
+    salt: number
+  ): Promise<any> {
     let existsAlready = false;
 
     const hash = crypto
