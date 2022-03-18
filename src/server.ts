@@ -92,13 +92,14 @@ export class Server {
     });
 
     app.get("/:hash", async (req: any, res: any) => {
-      const retrieved = await shortener.retrieveUrl(
+      let longUrl = await shortener.retrieveUrl(
         decodeURIComponent(req.params.hash)
       );
 
-      res.json({
-        longUrl: retrieved,
-      });
+      if (!longUrl.startsWith("http")) {
+        longUrl = "https://" + longUrl;
+      }
+      res.redirect(longUrl);
     });
 
     app.listen(this.port);

@@ -30,6 +30,9 @@ export class Shortener {
   async shortenUrl(longUrl: string): Promise<string> {
     const start = Date.now();
 
+    if (!longUrl.startsWith("http")) {
+      longUrl = "https://" + longUrl;
+    }
     console.log(`Shortening url ${longUrl}...`);
 
     let salt = 0;
