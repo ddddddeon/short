@@ -3,42 +3,12 @@ import { Db } from "mongodb";
 import * as crypto from "crypto";
 import { Gauge } from "prom-client";
 
-import { Util } from "./util";
+import { Metrics } from "./metrics";
 
 const BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 type RedisClientType = ReturnType<typeof redis.createClient>;
 
-// prometheus metrics
-const hashCollisions = new Gauge<string>({
-  name: "hash_collisions",
-  help: "Number of hash collisions that have occurred",
-});
-
-const urlsShortened = new Gauge<string>({
-  name: "urls_shortened",
-  help: "Total number of URLs shortened",
-});
-
-const timeToShortenMs = new Gauge<string>({
-  name: "time_to_shorten_ms",
-  help: "Time taken to shorten one URL (ms)",
-});
-
-const timeToRetrieveMs = new Gauge<string>({
-  name: "time_to_retrieve_ms",
-  help: "Time taken to retrieve a full URL from a shortened URL",
-});
-
-const cacheHits = new Gauge<string>({
-  name: "cache_hits",
-  help: "Total number of cache hits when retrieving a full URL from a shortened URL",
-});
-
-const dbHits = new Gauge<string>({
-  name: "db_hits",
-  help: "Total number of database hits when retrieving a full URL from a shortened URL",
-});
 
 export class Shortener {
   rdb: RedisClientType;
@@ -71,7 +41,7 @@ export class Shortener {
       salt++;
     } while (shortened.existsAlready);
 
-    timeToShortenMs.set(Date.now() - start);
+    Metrics.timeToShortenMs.set(Date.now() - start);
 
     return shortened.shortUrl;
   }
@@ -81,8 +51,8 @@ export class Shortener {
 
     const cachedResult = await this.rdb.get(hash);
     if (cachedResult) {
-      await Util.incrementMetric(this.db, cacheHits, "cache_hits");
-      timeToRetrieveMs.set(Date.now() - start);
+      await Metrics.incrementMetric(this.db, Metrics.cacheHits, "cache_hits");
+      Metrics.timeToRetrieveMs.set(Date.now() - start);
       return cachedResult;
     }
 
@@ -90,12 +60,12 @@ export class Shortener {
       hash: hash,
     });
     if (dbResult) {
-      await Util.incrementMetric(this.db, dbHits, "db_hits");
-      timeToRetrieveMs.set(Date.now() - start);
+      await Metrics.incrementMetric(this.db, Metrics.dbHits, "db_hits");
+      Metrics.timeToRetrieveMs.set(Date.now() - start);
       return dbResult.longUrl;
     }
 
-    timeToRetrieveMs.set(Date.now() - start);
+    Metrics.timeToRetrieveMs.set(Date.now() - start);
 
     // redirect to homepage if no result found in cache or db
     return (
@@ -146,9 +116,9 @@ export class Shortener {
       if (result.longUrl !== longUrl) {
         existsAlready = true;
 
-        const hashCollisionCount = await Util.incrementMetric(
+        const hashCollisionCount = await Metrics.incrementMetric(
           this.db,
-          hashCollisions,
+          Metrics.hashCollisions,
           "hash_collisions"
         );
 
@@ -174,7 +144,7 @@ export class Shortener {
         longUrl: longUrl,
       });
 
-      await Util.incrementMetric(this.db, urlsShortened, "urls_shortened");
+      await Metrics.incrementMetric(this.db, Metrics.urlsShortened, "urls_shortened");
     }
 
     return { shortUrl: shortUrl, existsAlready: existsAlready };
