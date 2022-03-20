@@ -59,8 +59,24 @@ A couple of alternatives to MD5 hashing were considered:
 
 - **A lookup table of short URL codes**: Having an external service that generates a large number of unique short URL codes and storing it in a database would reduce computational overhead on the web service, but more attention would have to be paid to ensure that each short URL code is consumed exactly once, and if the short URL code lookup database/service becomes unavailable, the URL shortening service becomes unusable. 
 
-While deterministic MD5 hashing and base58-encoding is more computationally intensive, uniqueness is more easily achieved and collisions are much rarer. Because hashing is CPU-bound, it is also a clear and easy metric to keep track of to determine autoscaling policies. If a web service instance is consistently using a lot of CPU, it is most likely busy computing hashes, and the service should be scaled horizontally.
+While deterministic MD5 hashing and base58-encoding is more computationally intensive, uniqueness is more easily achieved and collisions are much rarer. Because hashing is CPU-bound, it is also a clear and easy metric to keep track of to determine autoscaling policies. If a web service instance is consistently using a lot of CPU, it is most likely busy computing hashes, thus the service should be scaled horizontally.
 
+## Monitoring
+
+The web service exposes a `/metrics` endpoint that provides various data to a Prometheus server. The service is instrumented to provide data such as:
+
+- Number of cache hits
+- Number of URLs shortened
+- Time taken to generate a short URL
+- Time taken to retrieve a long URL from the cache or database
+
+The kubernetes cluster contains a prometheus server and a grafana frontend with dashboards that perform PromQL queries on data provided by Prometheus.
+
+## Limitations and TODOs
+- There is currently a 1:1 ratio of long URL to short URL, meaning if multiple users supply the same long URL, the same short URL will be returned to all of them. In this use case it is not a problem but for other use cases this may not be desirable behaviour. 
+- Server logs are not sent anywhere. An Elasticsearch/Logstash/Kibana setup could be used to ingest logs. 
+- The MongoDB pod in the kubernetes cluster is not backed by persistent storage, but in a real production environment the data should be written to a volume that persists even if the pod restarts.
+- SSL is not yet enabled.
 
 
 
