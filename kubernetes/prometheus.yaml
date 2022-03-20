@@ -15,6 +15,14 @@ spec:
       containers:
         - name: master
           image: dddeon/prom
+          readinessProbe:
+            httpGet:
+              path: /targets
+              port: 9090
+          livenessProbe:
+            httpGet:
+              path: /targets
+              port: 9090
           resources:
             requests:
               cpu: 100m
@@ -30,6 +38,7 @@ metadata:
   labels:
     app: prometheus
 spec:
+  type: NodePort
   ports:
     - port: 9090
       targetPort: 9090
