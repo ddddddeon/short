@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: short-deployment
+  name: short
   labels:
     app: short
 spec:
@@ -60,8 +60,7 @@ metadata:
   name: short-ingress
 spec:
   rules:
-    - host: "grafana.ddddddeon.com"
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix
