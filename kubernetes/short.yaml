@@ -21,13 +21,13 @@ spec:
             - containerPort: 9000
           env:
             - name: APP_HOST
-              value: "http://192.168.49.2" # FIXME https://ddddddeon.com
+              value: "http://ddddddeon.com" # FIXME https://ddddddeon.com
             - name: APP_PORT
               value: "9000"
             - name: PROXY_PORT
-              value: "30001" #FIXME 443
+              value: "80" #FIXME 443
             - name: MONGO_HOST
-              value: host.minikube.internal # minikube-specific access to host machine
+              value: mongo # minikube-specific access to host machine
             - name: MONGO_PORT
               value: "27017"
             - name: REDIS_HOST
@@ -52,4 +52,21 @@ spec:
     - protocol: TCP
       port: 9000
       targetPort: 9000
-      nodePort: 30001
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: short-ingress
+spec:
+  rules:
+    - host: "grafana.ddddddeon.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: short-service
+                port:
+                  number: 9000

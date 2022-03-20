@@ -61,7 +61,7 @@
       var xhr = new XMLHttpRequest();
 
       // TODO validate input lol
-      xhr.open("GET", "/shorten/" + urlInput.value);
+      xhr.open("GET", "/shorten/" + encodeURIComponent(urlInput.value));
       xhr.responseType = "json";
 
       xhr.onload = () => {

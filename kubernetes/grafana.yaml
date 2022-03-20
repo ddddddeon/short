@@ -15,6 +15,14 @@ spec:
       containers:
         - name: master
           image: grafana/grafana-oss
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: 3000
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: 3000
           resources:
             requests:
               cpu: 100m
@@ -26,7 +34,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana
+  name: grafana-service
   labels:
     app: grafana
 spec:
@@ -34,6 +42,23 @@ spec:
   ports:
     - port: 3000
       targetPort: 3000
-      nodePort: 30003
   selector:
     app: grafana
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+spec:
+  rules:
+    - host: grafana.ddddddeon.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana-service
+                port:
+                  number: 3000
