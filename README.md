@@ -19,7 +19,7 @@ The shortened URL will redirect the user to the original long URL.
 ## Storage and caching
 Upon receiving a long URL from the user and generating a short URL, the long URL and short URL hash are stored in a MongoDB database and cached in Redis. 
 
-It is reasonable to assume that for each user that generates a short URL, more than one other users will visit the short URL on average. For example, if someone posts the short URL on social media, multiple people will likely click the link. This is the reason caching is done on write. 
+It is reasonable to assume that for each user that generates a short URL, multiple other users will visit the short URL on average. If someone posts the short URL on social media, multiple people will likely click the link, so caching is done on write. 
 
 When a user clicks through a short URL link, the cache is checked first before the Mongo database. 
 
@@ -36,7 +36,7 @@ md5("https://unity.com", "0") -> 10703ec7bdfff90b4444523f02392ae9
 Then, each byte of the hash is base58-encoded:
 
 ```
-base58(10703ec7bdfff90b4444523f02392ae9) -> Hw5SGQJCBBR63zj2
+base58(10703ec7bdfff90b4444523f02392ae9) -> "Hw5SGQJCBBR63zj2"
 ```
 
 The base58-encoded hash is then truncated to the first 7 characters.
@@ -49,7 +49,7 @@ This allows for `58 ^ 7` (approximately 2.2 trillion) unique shortened URL hashe
 
 Before writing the long URL and its generated hash, the service queries the database for any entries already containing that hash. If the hash exists in the database and it matches the user-supplied long URL, the existing shortened URL is returned to the user. 
 
-If the hash exists in the database but the corresponding long URL does **not** match the one supplied by the user, a hash collision has occurred. In this case, the hashing process is restarted but with an incremented salt value. This process repeats until there is no collision. Because the first step in the generation process an MD5 hash, collisions are exceedingly rare, and are reported to monitoring services when it does occur. 
+If the hash exists in the database but the corresponding long URL does **not** match the one supplied by the user, a hash collision has occurred. In this case, the hashing process is restarted but with an incremented salt value. This process repeats until there is no collision. Because the first step in the generation process is an MD5 hash, collisions are exceedingly rare, and are reported to monitoring services when it does occur. 
 
 
 A couple of alternatives to MD5 hashing were considered:
@@ -73,7 +73,7 @@ The web service exposes a `/metrics` endpoint that provides various data to a Pr
 The kubernetes cluster contains a prometheus server and a grafana frontend with dashboards that perform PromQL queries on data provided by Prometheus.
 
 ## Limitations and TODOs
-- There is currently a 1:1 ratio of long URL to short URL, meaning if multiple users supply the same long URL, the same short URL will be returned to all of them. In this use case it is not a problem but for other use cases this may not be desirable behaviour. 
+- There is currently a 1:1 ratio of long URL to short URL, meaning if multiple users supply the same long URL, the same short URL will be returned to all of them. For some use cases this may not be desirable behaviour. 
 - Server logs are not sent anywhere. An Elasticsearch/Logstash/Kibana setup could be used to ingest logs. 
 - The MongoDB pod in the kubernetes cluster is not backed by persistent storage, but in a real production environment the data should be written to a volume that persists even if the pod restarts.
 - SSL is not yet enabled.
