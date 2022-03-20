@@ -1,8 +1,7 @@
 # short 
 A URL shortening service written in Typescript
 
-![shortener_architecture](https://user-images.githubusercontent.com/6937171/159184921-ce1edcdc-59a2-41c0-8bac-0aa4cf5e6998.png)
-
+![Shortener Architecture](https://user-images.githubusercontent.com/6937171/159184935-b496dde5-5590-4ddc-bad8-f5c5f6a22df8.png)
 
 
 
