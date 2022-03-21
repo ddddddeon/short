@@ -5,7 +5,8 @@ A URL shortening service written in Typescript
 
 URL Shortener runs on Google Kubernetes Engine, with nodes running in three different zones. There are ingress endpoints allowing outside access to the load-balanced web frontend, as well as Grafana dashboards for monitoring. Redis is used as a cache, and MongoDB is used for persistent storage.
 
-![Shortener Architecture](https://user-images.githubusercontent.com/6937171/159193166-a3b9d6e3-2f54-488e-b3ca-ced86dcec0f2.png)
+![Shortener Architecture](https://user-images.githubusercontent.com/6937171/159299890-3aaa7314-8bdc-4274-930c-d4d6087701d8.png)
+
 
 ## Web service
 
@@ -85,7 +86,7 @@ The web service exposes a `/metrics` endpoint that provides various data to a Pr
 
 The kubernetes cluster contains a prometheus server and a grafana frontend with dashboards that perform PromQL queries on data provided by Prometheus.
 
-![Shortener Architecture](https://user-images.githubusercontent.com/6937171/159299483-effa3985-9b89-4fa5-9e44-b2e5cdbf1f6f.png)
+![grafana3](https://user-images.githubusercontent.com/6937171/159299935-d5ea9318-a4b2-4a7c-bcae-92343fba11c1.png)
 
 ## Limitations and TODOs
 - There is currently a 1:1 ratio of long URL to short URL, meaning if multiple users supply the same long URL, the same short URL will be returned to all of them. For some use cases this may not be desirable behaviour. 
