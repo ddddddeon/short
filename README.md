@@ -14,7 +14,6 @@ The web frontend allows a user to provide a URL and returns a shortened URL that
 ```http(s)://hostname/<hash>```
 
 The shortened URL will redirect the user to the original long URL. 
-
 ## Storage and caching
 Upon receiving a long URL from the user and generating a short URL, the long URL and short URL hash are stored in a MongoDB database and cached in Redis. 
 
