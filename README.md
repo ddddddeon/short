@@ -5,7 +5,7 @@ A URL shortening service written in Typescript
 
 URL Shortener runs on Google Kubernetes Engine, with nodes running in three different zones. There are ingress endpoints allowing outside access to the load-balanced web frontend, as well as Grafana dashboards for monitoring. Redis is used as a cache, and MongoDB is used for persistent storage.
 
-![Shortener Architecture](https://user-images.githubusercontent.com/6937171/159300251-722bd127-3172-48d1-9c2d-5aef9a2599b8.png)
+![Shortener Architecture](https://user-images.githubusercontent.com/6937171/159301499-eed3abc1-5a4a-45bd-84c5-cadd11d2dc19.png)
 
 ## Web service
 
