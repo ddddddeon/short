@@ -85,7 +85,7 @@ The web service exposes a `/metrics` endpoint that provides various data to a Pr
 
 The kubernetes cluster contains a prometheus server and a grafana frontend with dashboards that perform PromQL queries on data provided by Prometheus.
 
-![grafana3](https://user-images.githubusercontent.com/6937171/159193373-27b176cf-7787-40cb-8b95-0dae49092c2e.png)
+![Shortener Architecture](https://user-images.githubusercontent.com/6937171/159299483-effa3985-9b89-4fa5-9e44-b2e5cdbf1f6f.png)
 
 ## Limitations and TODOs
 - There is currently a 1:1 ratio of long URL to short URL, meaning if multiple users supply the same long URL, the same short URL will be returned to all of them. For some use cases this may not be desirable behaviour. 
@@ -93,6 +93,7 @@ The kubernetes cluster contains a prometheus server and a grafana frontend with 
 - The MongoDB pod in the kubernetes cluster is not backed by persistent storage, but in a real production environment the data should be written to a volume that persists even if the pod restarts. MongoDB should also be clustered in a production environment-- sharded and replicated.
 - SSL is not yet enabled.
 - The kubernetes cluster in Google Cloud currently runs on 3 nodes, each in different zones in the `us-east1` region. In order to be more highly available, the cluster should span multiple regions. 
+- The Prometheus and Grafana web interfaces are open to the public internet for demo purposes. In a production environment these would both be only accessible internally.
 
 
 
