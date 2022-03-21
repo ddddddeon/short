@@ -3,7 +3,7 @@ A URL shortening service written in Typescript
 
 ## Architecture
 
-URL Shortener runs on Google Kubernetes Engine, with ingress endpoints allowing outside access to the load-balanced web frontend, as well as Grafana dashboards for monitoring. Redis is used as a cache, and MongoDB is used for persistent storage.
+URL Shortener runs on Google Kubernetes Engine, with nodes running in three different zones. There are ingress endpoints allowing outside access to the load-balanced web frontend, as well as Grafana dashboards for monitoring. Redis is used as a cache, and MongoDB is used for persistent storage.
 
 ![Shortener Architecture](https://user-images.githubusercontent.com/6937171/159193166-a3b9d6e3-2f54-488e-b3ca-ced86dcec0f2.png)
 
@@ -91,6 +91,7 @@ The kubernetes cluster contains a prometheus server and a grafana frontend with 
 - Server logs are not sent anywhere. An Elasticsearch/Logstash/Kibana setup could be used to ingest logs. 
 - The MongoDB pod in the kubernetes cluster is not backed by persistent storage, but in a real production environment the data should be written to a volume that persists even if the pod restarts. MongoDB should also be clustered in a production environment-- sharded and replicated.
 - SSL is not yet enabled.
+- The kubernetes cluster in Google Cloud currently runs on 3 nodes, each in different zones in the `us-east1` region. In order to be more highly available, the cluster should span multiple regions. 
 
 
 
