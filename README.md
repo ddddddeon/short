@@ -19,6 +19,21 @@ The shortened URL will redirect the user to the original long URL.
 ## Storage and caching
 Upon receiving a long URL from the user and generating a short URL, the long URL and short URL hash are stored in a MongoDB database and cached in Redis. 
 
+In MongoDB the data is stored in the `urls` collection in this format:
+
+```json
+{
+  longUrl: "https://unity.com",
+  hash: "Hw5SGQJ"
+}
+```
+
+In Redis the data is stored with the hash as the key and the long URL as the value, so that URLs can be looked up by hash when the short URL link is clicked.
+
+```
+Hw5SGQJ: https://unity.com
+```
+
 It is reasonable to assume that for each user that generates a short URL, multiple other users will visit the short URL on average. If someone posts the short URL on social media, multiple people will likely click the link, so caching is done on write. 
 
 When a user clicks through a short URL link, the cache is checked first before the Mongo database. 
