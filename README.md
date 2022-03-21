@@ -75,7 +75,7 @@ The kubernetes cluster contains a prometheus server and a grafana frontend with 
 ## Limitations and TODOs
 - There is currently a 1:1 ratio of long URL to short URL, meaning if multiple users supply the same long URL, the same short URL will be returned to all of them. For some use cases this may not be desirable behaviour. 
 - Server logs are not sent anywhere. An Elasticsearch/Logstash/Kibana setup could be used to ingest logs. 
-- The MongoDB pod in the kubernetes cluster is not backed by persistent storage, but in a real production environment the data should be written to a volume that persists even if the pod restarts.
+- The MongoDB pod in the kubernetes cluster is not backed by persistent storage, but in a real production environment the data should be written to a volume that persists even if the pod restarts. MongoDB should also be clustered in a production environment-- sharded and replicated.
 - SSL is not yet enabled.
 
 
