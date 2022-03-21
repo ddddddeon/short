@@ -23,8 +23,8 @@ In MongoDB the data is stored in the `urls` collection in this format:
 
 ```json
 {
-  longUrl: "https://unity.com",
-  hash: "Hw5SGQJ"
+  "longUrl": "https://unity.com",
+  "hash": "Hw5SGQJ"
 }
 ```
 
