@@ -86,6 +86,8 @@ The web service exposes a `/metrics` endpoint that provides various data to a Pr
 
 The kubernetes cluster contains a prometheus server and a grafana frontend with dashboards that perform PromQL queries on data provided by Prometheus.
 
+![grafana3](https://user-images.githubusercontent.com/6937171/159193373-27b176cf-7787-40cb-8b95-0dae49092c2e.png)
+
 ## Limitations and TODOs
 - There is currently a 1:1 ratio of long URL to short URL, meaning if multiple users supply the same long URL, the same short URL will be returned to all of them. For some use cases this may not be desirable behaviour. 
 - Server logs are not sent anywhere. An Elasticsearch/Logstash/Kibana setup could be used to ingest logs. 
